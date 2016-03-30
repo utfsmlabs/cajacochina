@@ -11,18 +11,6 @@ services:
       - "peppa"
     volumes:
       - "../app/:/cajacochina/"
-  orson:
-    image: nginx
-    container_name: orson
-    ports:
-      - "3000:80"
-    links:
-      - "porky"
-    restart: always
-    volumes_from:
-      - "porky:ro"
-    volumes:
-      - "./nginx.conf:/etc/nginx/nginx.conf"
   peppa:
     image: postgres:9.5.1
     container_name: peppa
