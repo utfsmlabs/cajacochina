@@ -1,0 +1,49 @@
+{% extends "_base.html" %}
+{% import "admin/_menu.html" as menu %}
+
+{% block body %}
+{{ menu.build('payments') }}
+{% if payments.exists() %}
+<div class="row">
+  <table class="table table-striped">
+    <tr>
+      <th>Usuario</th>
+      <th>Monto</th>
+      <th>Fecha</th>
+      <th>Acciones</th>
+    </tr>
+    {% for payment in payments %}
+    <tr>
+      <td>{{payment.user.name}}</td>
+      <td>${{payment.amount}}</td>
+      <td>{{payment.created_at.strftime('%Y-%m-%d, %H:%M')}}</td>
+      <td>
+        <a href="{{url_for('forget_payment', payment_id=payment.id)}}" class="btn btn-xs btn-danger">Robarse la plata</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+<div class="row">
+  {% if total_pages > 0 %}
+  <nav>
+    <ul class="pager">
+      <li class="previous">
+        <a href="{{url_for('payments_index', page=page - 1)}}">&larr; Página anterior</a>
+      </li>
+      <li>
+        {{page}} de {{total_pages + 1}} páginas
+      </li>
+      <li class="next">
+        <a href="{{url_for('payments_index', page=page + 1)}}">Página siguiente &rarr;</a>
+      </li>
+    </ul>
+  </nav>
+  {% endif %}
+</div>
+{% else %}
+<div class="alert alert-info">
+  No existen deudas registradas
+</div>
+{% endif %}
+{% endblock %}

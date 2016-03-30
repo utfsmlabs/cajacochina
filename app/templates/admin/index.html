@@ -1,0 +1,80 @@
+{% extends "_base.html" %}
+{% import "admin/_menu.html" as menu %}
+
+{% block body %}
+{{ menu.build('index') }}
+
+<div class="row">
+  <div class="col-md-10 col-md-offset-1">
+    <div class="page-header">
+      <p class="lead text-center">La deuda total de los cochinos es de: <strong>${{loaned - paid}}</strong> </p>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-4">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Últimos egresos</h3>
+      </div>
+      {% if not last_loaned.exists() %}
+      <div class="panel-body">
+      No hay egresos registrados.
+      </div>
+      {% else %}
+      <ul class="list-group">
+      {% for loan in last_loaned %}
+        <li class="list-group-item">
+        <small>
+        <strong>{{loan.user.name}}</strong>: ${{loan.amount}} ({{loan.created_at.strftime('%Y-%m-%d, %H:%M')}})
+        </small>
+        </li>
+      {% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Los mas cochinos.</h3>
+      </div>
+      {% if not top_five.exists() %}
+        <div class="panel-body">
+        Nadie tiene deudas.
+        </div>
+      {% else %}
+        <ul class="list-group">
+        {% for entry in top_five %}
+          <li class="list-group-item">
+            <strong>{{entry.name}}: ${{entry.total_debt}}</strong>
+          </li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Últimos ingresos</h3>
+      </div>
+      {% if not last_paid.exists() %}
+        <div class="panel-body">
+        No hay ingresos registrados.
+        </div>
+      {% else %}
+      <ul class="list-group">
+      {% for payment in last_paid %}
+        <li class="list-group-item">
+        <small>
+        <strong>{{payment.user.name}}</strong>: ${{payment.amount}} ({{payment.created_at.strftime('%Y-%m-%d, %H:%M')}})
+        </small>
+        </li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

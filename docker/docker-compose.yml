@@ -1,0 +1,35 @@
+version: '2'
+services:
+  porky:
+    build:
+      context: .
+      dockerfile: Dockerfile-porky
+    container_name: porky
+    command: bash /cajacochina/start.sh
+    restart: always
+    links:
+      - "peppa"
+    volumes:
+      - "../app/:/cajacochina/"
+  orson:
+    image: nginx
+    container_name: orson
+    ports:
+      - "3000:80"
+    links:
+      - "porky"
+    restart: always
+    volumes_from:
+      - "porky:ro"
+    volumes:
+      - "./nginx.conf:/etc/nginx/nginx.conf"
+  peppa:
+    image: postgres:9.5.1
+    container_name: peppa
+    volumes:
+      - "./.db/:/var/lib/postgresql"
+    environment:
+      POSTGRES_DB: cajacochina
+      POSTGRES_USER: cajacochina
+      POSTGRES_PASSWORD: cajacochina3000
+    restart: always

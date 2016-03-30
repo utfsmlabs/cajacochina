@@ -1,0 +1,56 @@
+{% extends "_base.html" %}
+
+{% block body %}
+<div class="page-header">
+  <h2>Estado de Cuenta: {{user.name}}</h2>
+</div>
+
+<div class="row">
+  <div class="alert alert-info"><strong>Nota:</strong> Solo se mostrarán los últimos 10 préstamos y pagos (por separado).</div>
+</div>
+
+<div class="row">
+  <div class="col-md-6">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+      <h3 class="panel-title">Total adeudado: ${{user.get_outcome_sum()}}</h3>
+      </div>
+      {% if loaned.exists() %}
+      <ul class="list-group">
+      {% for loan in loaned %}
+        <li class="list-group-item">{{loan.created_at.strftime('%Y-%m-%d, %H:%M')}}: ${{loan.amount}}</li>
+      {% endfor %}
+      </ul>
+      {% else %}
+      <div class="panel-body">
+        <p>No existen deudas registradas</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+      <h3 class="panel-title">Total pagado: ${{user.get_income_sum()}}</h3>
+      </div>
+      {% if paid.exists() %}
+      <ul class="list-group">
+      {% for payment in paid %}
+        <li class="list-group-item">{{payment.created_at.strftime('%Y-%m-%d, %H:%M')}}: ${{payment.amount}}</li>
+      {% endfor %}
+      </ul>
+      {% else %}
+      <div class="panel-body">
+        <p>No existen pagos registrados</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="text-center">
+  <a href="/" class="btn btn-primary">Volver</a>
+  </div>
+</div>
+{% endblock %}

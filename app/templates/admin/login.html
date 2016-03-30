@@ -1,0 +1,22 @@
+{% extends "_base.html" %}
+{% block body %}
+<div class="col-md-8 col-md-offset-2">
+  <div class="well well-sm">
+  <h3>Administración</h3>
+  <form method="POST">
+    <div class="form-group">
+      <label for="username" class="form-label">Usuario</label>
+      <input type="text" class="form-control" name="username">
+    </div>
+    <div class="form-group">
+      <label for="password" class="form-label">Password</label>
+      <input type="password" class="form-control" name="password">
+    </div>
+    <div class="form-group text-center">
+      <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
+    </div>
+    <input type="hidden" name="_csrf_token" value="{{csrf_token()}}">
+  </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "_base.html" %}
+{% import "admin/_menu.html" as menu %}
+
+{% block body %}
+{{ menu.build('users') }}
+
+<div class="row">
+  <div class="col-md-10 col-md-offset-1">
+    <div class="page-header">
+      <a class="btn btn-primary pull-right" href="{{url_for('admin_create_user')}}">Crear usuario</a>
+      <h2>Lista de usuarios</h2>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    {% if users.exists() %}
+    <table class="table">
+      <tr>
+        <th>Usuario</th>
+        <th>Deuda</th>
+        <th>Pagado</th>
+        <th>Deuda total</th>
+      </tr>
+      {% for user in users %}
+      <tr>
+        <td>{{user.name}} ({{user.handle}})</td>
+        <td>${{user.get_outcome_sum()}}</td>
+        <td>${{user.get_income_sum()}}</td>
+        <td>${{user.get_outcome_sum() - user.get_income_sum()}}
+      </tr>
+      {% endfor %}
+    </table>
+    {% else %}
+    <div class="alert alert-info">
+    No hay usuarios registrados en el sistema.
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

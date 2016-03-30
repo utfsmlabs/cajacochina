@@ -1,0 +1,33 @@
+{% extends "_base.html" %}
+{% import "admin/_menu.html" as menu %}
+
+{% block body %}
+{{ menu.build('users') }}
+
+<div class="row">
+  <div class="col-md-10 col-md-offset-1">
+    <div class="page-header">
+      <h2>Crear Usuario</h2>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-10 col-md-offset-1">
+    <form method="POST" autocomplete="off">
+      <div class="form-group">
+        <label for="handle" class="form-label">Login LDAP</label>
+        <input type="text" name="handle" class="form-control">
+      </div>
+      <div class="form-group">
+        <label for="name" class="form-label">Nombre</label>
+        <input type="text" name="name" class="form-control">
+      </div>
+      <div class="form-group">
+        <button type="submit" class="btn btn-primary">Agregar Usuario</button>
+      </div>
+      <input type="hidden" value="{{csrf_token()}}" name="_csrf_token">
+    </form>
+  </div>
+</div>
+{% endblock %}

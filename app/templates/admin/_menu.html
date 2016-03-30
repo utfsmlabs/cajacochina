@@ -1,0 +1,8 @@
+{% macro build(active) %}
+<ul class="nav nav-tabs">
+  <li {{ 'class=active' if active == 'index' }}><a href="{{url_for('admin_index')}}">Indice</a></li>
+  <li {{ 'class=active' if active == 'debts' }}><a href="{{url_for('debts_index')}}">Prestamos</a></li>
+  <li {{ 'class=active' if active == 'payments' }}><a href="{{url_for('payments_index')}}">Pagos</a></li>
+  <li {{ 'class=active' if active == 'users' }}><a href="{{url_for('admin_users')}}">Usuarios</a></li>
+</ul>
+{% endmacro %}

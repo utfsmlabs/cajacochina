@@ -1,0 +1,49 @@
+{% extends "_base.html" %}
+{% import "admin/_menu.html" as menu %}
+
+{% block body %}
+{{ menu.build('debts') }}
+{% if debts.exists() %}
+<div class="row">
+  <table class="table table-striped">
+    <tr>
+      <th>Usuario</th>
+      <th>Monto</th>
+      <th>Fecha</th>
+      <th>Acciones</th>
+    </tr>
+    {% for debt in debts %}
+    <tr>
+      <td>{{debt.user.name}}</td>
+      <td>${{debt.amount}}</td>
+      <td>{{debt.created_at.strftime('%Y-%m-%d, %H:%M')}}</td>
+      <td>
+        <a href="{{url_for('forget_debt', debt_id=debt.id)}}" class="btn btn-xs btn-danger">Perdonazo</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+<div class="row">
+  {% if total_pages > 0 %}
+  <nav>
+    <ul class="pager">
+      <li class="previous">
+        <a href="{{url_for('debts_index', page=page - 1)}}">&larr; Página anterior</a>
+      </li>
+      <li>
+        {{page}} de {{total_pages + 1}} páginas
+      </li>
+      <li class="next">
+        <a href="{{url_for('debts_index', page=page + 1)}}">Página siguiente &rarr;</a>
+      </li>
+    </ul>
+  </nav>
+  {% endif %}
+</div>
+{% else %}
+<div class="alert alert-info">
+  No existen deudas registradas
+</div>
+{% endif %}
+{% endblock %}
