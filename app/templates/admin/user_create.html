@@ -24,6 +24,10 @@
         <input type="text" name="name" class="form-control">
       </div>
       <div class="form-group">
+        <label for="initial_debt" class="form-label">Deuda Inicial</label>
+        <input type="text" name="initial_debt" class="form-control">
+      </div>
+      <div class="form-group">
         <button type="submit" class="btn btn-primary">Agregar Usuario</button>
       </div>
       <input type="hidden" value="{{csrf_token()}}" name="_csrf_token">

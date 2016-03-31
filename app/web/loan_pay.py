@@ -25,7 +25,7 @@ _schema = {
   },
   'amount': {
     'type': 'string',
-    'regex': '^[1-9][0-9]+$'
+    'regex': '^[1-9][0-9]*$'
   },
   '_csrf_token': {
     'required': True,

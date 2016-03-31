@@ -14,7 +14,7 @@ class Base(p.Model):
 class User(Base):
   handle = p.CharField(unique=True)
   name = p.CharField()
-  created_at = p.DateTimeField(default=datetime.now())
+  created_at = p.DateTimeField()
   is_active = p.BooleanField(default=True)
 
   def get_income_sum(self):
@@ -26,13 +26,13 @@ class User(Base):
 class Income(Base):
   amount = p.DecimalField()
   reason = p.CharField()
-  user = p.ForeignKeyField(User, related_name=u'amounts_paid')
+  user = p.ForeignKeyField(User, related_name=u'amounts_paid', on_delete='CASCADE')
   created_at = p.DateTimeField()
 
 class Outcome(Base):
   amount = p.DecimalField()
   reason = p.CharField()
-  user = p.ForeignKeyField(User, related_name=u'amounts_loaned')
+  user = p.ForeignKeyField(User, related_name=u'amounts_loaned', on_delete='CASCADE')
   created_at = p.DateTimeField()
 
 if __name__ == '__main__':

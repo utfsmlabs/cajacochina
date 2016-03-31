@@ -60,8 +60,9 @@ self.action.addEventListener("change", function(e) {
   self.update();
 });
 
-self.amount.addEventListener("blur", function(e) {
-  self.showUserLogin = !isNaN(parseInt(e.target.value, 10));
+self.amount.addEventListener("keyup", function(e) {
+  var parsedValue = parseInt(e.target.value, 10)
+  self.showUserLogin = !isNaN(parsedValue) && parsedValue > 0;
   self.update();
 });
 

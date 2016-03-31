@@ -3,6 +3,7 @@
 {% block body %}
 <div class="page-header">
   <h2>Estado de Cuenta: {{user.name}}</h2>
+  <p class="lead">Deuda total: ${{user.get_outcome_sum() - user.get_income_sum()}}
 </div>
 
 <div class="row">

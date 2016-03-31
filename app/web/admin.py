@@ -5,7 +5,9 @@ from flask import (render_template, session,
                   redirect, url_for, request, flash)
 from cerberus import Validator
 import ldap
-from . import app
+from datetime import datetime
+
+from . import app, proxy
 import peewee as p
 import models as m
 
@@ -32,6 +34,10 @@ _add_user_schema = {
   'name': {
     'required': True,
     'empty': False
+  },
+  'initial_debt': {
+    'required': True,
+    'regex': '^[0-9]+$'
   },
   '_csrf_token': {
     'required': True,
@@ -129,14 +135,19 @@ def admin_index():
                 .group_by(m.Income.user).alias('total_payments')
                 )
 
+  total_debt_calculation = p.fn.COALESCE(total_loans.c.debt,0) - p.fn.COALESCE(total_payments.c.paid, 0)
+
   top_five = (m.User
               .select(m.User.name,
-                (total_loans.c.debt - total_payments.c.paid)
-                .alias('total_debt'))
-              .join(total_loans, on=(m.User.id == total_loans.c.user_id))
+                total_debt_calculation.alias('total_debt'))
+              .join(total_loans, p.JOIN.LEFT_OUTER,
+                on=(m.User.id == total_loans.c.user_id))
               .switch(m.User)
-              .join(total_payments, on=(m.User.id == total_payments.c.user_id))
-              .limit(5))
+              .join(total_payments, p.JOIN.LEFT_OUTER,
+                on=(m.User.id == total_payments.c.user_id))
+              .order_by(total_debt_calculation.desc())
+              .limit(5)
+              .where(total_debt_calculation > 0))
 
   return render_template('admin/index.html',
         loaned=total_loaned,
@@ -220,9 +231,48 @@ def admin_add_user():
     flash(u'Formulario incorrecto, favor intentar de nuevo', 'danger')
     return render_template('admin/user_create.html')
   try:
-    user = m.User.create(handle=request.form['handle'], name=request.form['name'])
-    flash(u'Usuario creado con éxito', 'info')
+    with proxy.atomic() as txn:
+      user = m.User.create(handle=request.form['handle'],
+       name=request.form['name'], created_at=datetime.now())
+      initial_debt = int(request.form['initial_debt'])
+      if initial_debt > 0:
+        debt = m.Outcome.create(amount=initial_debt,
+          user=user, created_at=datetime.now(), reason=u'Deuda inicial')
+        flash(u'Usuario creado con deuda inicial', 'info')
+      else:
+        flash(u'Usuario creado con éxito', 'info')
     return redirect(url_for('admin_users'))
   except p.IntegrityError:
-    flash(u'El usuario con dicho login LDAP ya existe', 'danger')
+    flash(u'Ocurrió un problema al insertar el usuario.', 'danger')
     return render_template('admin/user_create.html')
+
+@app.route(u'/admin/users/delete/<int:user>')
+def admin_delete_user(user):
+  try:
+    user = m.User.get(m.User.id == user)
+    can_be_deleted = (user.get_income_sum() - user.get_outcome_sum() == 0)
+    return render_template('admin/user_delete.html',
+      user=user, can_be_deleted=can_be_deleted)
+  except m.User.DoesNotExist:
+    flash(u'Dicho usuario no existe', 'danger')
+    return redirect(url_for('admin_users'))
+
+@app.route(u'/admin/users/delete/<int:user>', methods=['POST'])
+def admin_trash_user(user):
+  try:
+    user = m.User.get(m.User.id == user)
+    can_be_deleted = (user.get_income_sum() - user.get_outcome_sum() == 0)
+    if can_be_deleted:
+      user.delete_instance()
+      flash(
+        (u'El usuario ha sido eliminado del sistema, '
+         u'junto con su historial de deudas'), 'info')
+      return redirect(url_for('admin_index'))
+    else:
+      flash(
+        (u'El usuario no puede ser eliminado, '
+         u'posee deudas no pagadas o perdonadas'), 'danger')
+      return redirect(url_for('admin_users'))
+  except m.User.DoesNotExist:
+    flash(u'El usuario a eliminar no existe')
+    return redirect(url_for('admin_index'))
