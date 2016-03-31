@@ -1,0 +1,42 @@
+{% extends "_base.html" %}
+{% import "admin/_menu.html" as menu %}
+
+{% block body %}
+{{ menu.build('users') }}
+
+{% if can_be_deleted %}
+<div class="row">
+  <div class="col-md-10 col-md-offset-1">
+    <div class="page-header">
+      <h2>¿Seguro que desea borrar el usuario <strong>{{user.name}}</strong>?</h2>
+      <p class="lead">El historial de deudas también será borrado.</p>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+    <form method="POST" autocomplete="off">
+      <div class="btn-group btn-group-justified">
+        <div class="btn-group">
+        <button type="submit" class="btn btn-danger">Si</button>
+        </div>
+        <a href="{{url_for('admin_users')}}" class="btn btn-info">No</a>
+      </div>
+    <input type="hidden" name="_csrf_token" value="{{csrf_token()}}">
+    </form>
+  </div>
+</div>
+{% else %}
+<div class="row">
+  <div class="col-md-10 col-md-offset-1">
+    <div class="page-header">
+      <h2>El usuario {{user.name}} no puede ser eliminado.</h2>
+    </div>
+    <p class="lead">El usuario primero debe pagar sus deudas (o ser perdonadas) para que se pueda borrar</p>
+    <p class="text-center">
+      <a href="{{url_for('admin_users')}}" class="btn btn-primary">Volver</a>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
